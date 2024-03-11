@@ -22,7 +22,7 @@ async function fetchStockData(symbol, API_KEY) {
 
 export async function getServerSideProps(context) {
   const API_KEY = 'X8SVAMYPD5PK2GRK';
-  const symbols = ['IBM', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'FB', 'TSLA', 'NFLX', 'INTC', 'AMD', 'NVDA', 'ORCL', 'CSCO', 'SAP', 'ADBE'];
+  const symbols = ['AAPL', 'IBM', 'GOOGL', 'AMZN', 'META', 'TSLA', 'MSFT', 'NFLX', 'INTC', 'AMD', 'SAP', 'NVDA', 'ORCL', 'CSCO', 'ADBE'];
 
   const promises = symbols.map(symbol => fetchStockData(symbol, API_KEY));
   const results = await Promise.all(promises);
@@ -40,7 +40,7 @@ export default function Home({ stockData }) {
   return (
     <div style={{ padding: '20px' }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        Stock Dashboard
+        Dashboard
       </Typography>
       {stockData.map((stock, index) => (
         <Card key={index} style={{ marginBottom: '20px' }}>
