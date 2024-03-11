@@ -2,20 +2,26 @@ import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 
 async function fetchStockData(symbol, API_KEY) {
-  const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${API_KEY}`;
+  const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${API_KEY}`;
   try {
     const res = await fetch(url, { headers: { 'User-Agent': 'request' } });
     if (!res.ok) throw new Error(`Error fetching data for ${symbol}: ${res.statusText}`);
     const data = await res.json();
-    return data["Global Quote"] || {}; // Return an empty object if "Global Quote" is missing
+    const recentDate = Object.keys(data["Time Series (Daily)"])[0];
+    const recentData = data["Time Series (Daily)"][recentDate];
+    return {
+      symbol,
+      date: recentDate,
+      ...recentData,
+    };
   } catch (error) {
     console.error(error);
-    return {}; // Return an empty object in case of error
+    return {};
   }
 }
 
 export async function getServerSideProps(context) {
-  const API_KEY = 'YOUR_ALPHAVANTAGE_API_KEY';
+  const API_KEY = 'X8SVAMYPD5PK2GRK';
   const symbols = ['IBM', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'FB', 'TSLA', 'NFLX', 'INTC', 'AMD', 'NVDA', 'ORCL', 'CSCO', 'SAP', 'ADBE'];
 
   const promises = symbols.map(symbol => fetchStockData(symbol, API_KEY));
@@ -40,13 +46,25 @@ export default function Home({ stockData }) {
         <Card key={index} style={{ marginBottom: '20px' }}>
           <CardContent>
             <Typography color="textSecondary" gutterBottom>
-              Ticker: {stock['01. symbol']}
+              Ticker: {stock.symbol}
             </Typography>
             <Typography variant="h5" component="h2">
-              Price: {stock['05. price']}
+              Date: {stock.date}
             </Typography>
             <Typography color="textSecondary">
-              Volume: {stock['06. volume']}
+              Open: {stock['1. open']}
+            </Typography>
+            <Typography color="textSecondary">
+              High: {stock['2. high']}
+            </Typography>
+            <Typography color="textSecondary">
+              Low: {stock['3. low']}
+            </Typography>
+            <Typography variant="body2" component="p">
+              Close: {stock['4. close']}
+            </Typography>
+            <Typography variant="body2" component="p">
+              Volume: {stock['5. volume']}
             </Typography>
           </CardContent>
         </Card>
